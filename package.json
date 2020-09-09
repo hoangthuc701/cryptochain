@@ -1,0 +1,23 @@
+{
+  "name": "cryptochain",
+  "version": "1.0.0",
+  "description": "Simple Blockchain and Cryptocurrency",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoangthuc701/cryptochain.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoangthuc701/cryptochain/issues"
+  },
+  "homepage": "https://github.com/hoangthuc701/cryptochain#readme",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  }
+}
