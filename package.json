@@ -4,7 +4,8 @@
   "description": "Simple Blockchain and Cryptocurrency",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "lint": "eslint . "
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,12 @@
   },
   "homepage": "https://github.com/hoangthuc701/cryptochain#readme",
   "devDependencies": {
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
     "jest": "^23.6.0"
+  },
+  "dependencies": {
+    "hex-to-binary": "^1.0.1"
   }
 }
