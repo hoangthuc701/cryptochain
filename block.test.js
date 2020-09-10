@@ -50,7 +50,7 @@ describe("Block", () => {
     })
 
     it('creates a SHA-256 `hash` based on the proper inputs ', ()=>{
-      expect(mineBlock.hash).expect(cryptoHash(mineBlock.timestamp,lastBlock.hash, data));
+      expect(mineBlock.hash).toEqual(cryptoHash(mineBlock.timestamp,lastBlock.hash, data));
     })
 
   })
