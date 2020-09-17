@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 const HexToBinary = require('hex-to-binary');
 const Block = require('./block');
-const cryptoHash = require('./crypto-hash');
-const { GENESIS_DATA, MINE_RATE } = require('./config');
+const cryptoHash = require('../utils/crypto-hash');
+const { GENESIS_DATA, MINE_RATE } = require('../config');
 
 describe('Block', () => {
   const timestamp = 2000;

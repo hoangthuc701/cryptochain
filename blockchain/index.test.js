@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
-const Blockchain = require('./blockchain');
+const Blockchain = require('.');
 const Block = require('./block');
-const cryptoHash = require('./crypto-hash');
+const cryptoHash = require('../utils/crypto-hash');
 
 describe('Blockchain', () => {
   let blockchain;
