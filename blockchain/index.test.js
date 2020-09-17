@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 const Blockchain = require('.');
 const Block = require('./block');
-const cryptoHash = require('../utils/crypto-hash');
+const { cryptoHash } = require('../utils');
 
 describe('Blockchain', () => {
   let blockchain;
@@ -64,7 +64,12 @@ describe('Blockchain', () => {
           const difficulty = lastBlock.difficulty - 3;
           const hash = cryptoHash(timestamp, lastHash, difficulty, data, nonce);
           const badBlock = new Block({
-            timestamp, lastHash, difficulty, nonce, data, hash,
+            timestamp,
+            lastHash,
+            difficulty,
+            nonce,
+            data,
+            hash,
           });
           blockchain.chain.push(badBlock);
           expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);

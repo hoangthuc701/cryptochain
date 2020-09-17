@@ -1,6 +1,6 @@
 const HexToBinary = require('hex-to-binary');
 const { GENESIS_DATA, MINE_RATE } = require('../config');
-const cryptoHash = require('../utils/crypto-hash');
+const { cryptoHash } = require('../utils');
 
 class Block {
   // eslint-disable-next-line object-curly-newline
