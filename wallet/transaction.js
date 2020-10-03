@@ -1,11 +1,13 @@
 const uuid = require('uuid').v1;
 const { verifySignature } = require('../utils');
+const { MINING_REWARD, REWARD_INPUT } = require('../config');
 
 class Transaction {
-  constructor({ senderWallet, recipient, amount }) {
+  // eslint-disable-next-line object-curly-newline
+  constructor({ senderWallet, recipient, amount, outputMap, input }) {
     this.id = uuid();
-    this.outputMap = this.createOutputMap({ senderWallet, recipient, amount });
-    this.input = this.createInput({ senderWallet, outputMap: this.outputMap });
+    this.outputMap = outputMap || this.createOutputMap({ senderWallet, recipient, amount });
+    this.input = input || this.createInput({ senderWallet, outputMap: this.outputMap });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -45,6 +47,10 @@ class Transaction {
       return false;
     }
     return true;
+  }
+
+  static rewardTransaction({ minerWallet }) {
+    return new this({ input: REWARD_INPUT, outputMap: { [minerWallet.publicKey]: MINING_REWARD } });
   }
 
   update({ senderWallet, recipient, amount }) {

@@ -1,16 +1,20 @@
 /* eslint-disable no-undef */
 const Blockchain = require('.');
 const Block = require('./block');
+const Wallet = require('../wallet');
+const Transaction = require('../wallet/transaction');
 const { cryptoHash } = require('../utils');
 
 describe('Blockchain', () => {
   let blockchain;
   let newChain;
+  let errorMock;
 
   beforeEach(() => {
     blockchain = new Blockchain();
     newChain = new Blockchain();
-
+    errorMock = jest.fn();
+    global.console.error = errorMock;
     originalChain = blockchain.chain;
   });
 
@@ -84,14 +88,10 @@ describe('Blockchain', () => {
   });
 
   describe('replaceChain', () => {
-    let errorMock;
     let logMock;
 
     beforeEach(() => {
-      errorMock = jest.fn();
       logMock = jest.fn();
-
-      global.console.error = errorMock;
       global.console.log = logMock;
     });
 
@@ -127,6 +127,83 @@ describe('Blockchain', () => {
           blockchain.replaceChain(newChain.chain);
           expect(blockchain.chain).toEqual(newChain.chain);
         });
+      });
+    });
+  });
+  describe('validTransactionData()', () => {
+    let transaction;
+    let rewardTransaction;
+    let wallet;
+
+    beforeEach(() => {
+      wallet = new Wallet();
+      transaction = wallet.createTransaction({ recipient: 'foo-address', amount: 65 });
+      rewardTransaction = Transaction.rewardTransaction({ minerWallet: wallet });
+    });
+
+    describe('and the transaction  data is valid', () => {
+      it('return true', () => {
+        newChain.addBlock({ data: [transaction, rewardTransaction] });
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(true);
+      });
+    });
+
+    describe('and the transaction data has multiple rewards', () => {
+      it('returns false', () => {
+        newChain.addBlock({ data: [transaction, rewardTransaction, rewardTransaction] });
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(false);
+      });
+    });
+
+    describe('and the transaction data has at least one malformed outputMap', () => {
+      describe('and the transaction is not a reward transaction', () => {
+        it('returns false', () => {
+          transaction.outputMap[wallet.publicKey] = 999999;
+          newChain.addBlock({ data: [transaction, rewardTransaction] });
+          expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(false);
+          expect(errorMock).toHaveBeenCalled();
+        });
+      });
+      describe('and the transaction is a reward transaction', () => {
+        it('returns false', () => {
+          rewardTransaction.outputMap[wallet.publicKey] = 99999999;
+          newChain.addBlock({ data: [transaction, rewardTransaction] });
+          expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(false);
+          expect(errorMock).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('and the transaction data has at least one malformed input', () => {
+      it('returns false and logs an error', () => {
+        wallet.balance = 9000;
+
+        const evilOutputMap = {
+          [wallet.publicKey]: 8900,
+          fooRecipient: 100,
+        };
+        const evilTransaction = {
+          input: {
+            timestamp: Date.now(),
+            amount: wallet.balance,
+            address: wallet.publicKey,
+            signature: wallet.sign(evilOutputMap),
+          },
+          outputMap: evilOutputMap,
+        };
+        newChain.addBlock({ data: [evilTransaction, rewardTransaction] });
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(false);
+        expect(errorMock).toHaveBeenCalled();
+      });
+    });
+
+    describe('and a block contains multiple identical transactions', () => {
+      it('returns false and logs an error', () => {
+        newChain.addBlock({
+          data: [transaction, transaction, transaction, rewardTransaction],
+        });
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(false);
+        expect(errorMock).toHaveBeenCalled();
       });
     });
   });
